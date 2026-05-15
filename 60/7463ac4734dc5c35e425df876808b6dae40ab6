@@ -1,0 +1,23 @@
+answers/ex5_loop_scenario.md
+  s_37e31b04deb404::t_4cdda7e714b997 15-26,30-33
+answers/ex7_handoff_bridge.md
+  s_37e31b04deb404::t_f3aff4aed83a6c 25,27-28
+answers/ex9_reflection.md
+  s_37e31b04deb404::t_1ec84e2697c893 26-28
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "607463ac4734dc5c35e425df876808b6dae40ab6",
+  "prompts": {},
+  "sessions": {
+    "s_37e31b04deb404": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "60099ed6-5f5a-494c-9cfb-caa584144a35",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Artur Arapov <art87able@gmail.com>"
+    }
+  }
+}
