@@ -22,9 +22,10 @@ verifies the trace has at least one round_start, at least one
 state_changed, and at least one tool call — catching the case where
 the bridge reports success without doing real work.
 
-The stale-handoff cleanup moves old ipc/handoff_to_structured.json
+The stale-handoff cleanup moves old ipc/input/handoff_to_structured.json
 files into logs/handoffs/ instead of deleting them, preserving the
-audit trail.
+audit trail (see bridge.py:147-149, archiving to
+session.handoffs_audit_dir).
 
 ## Citations
 
