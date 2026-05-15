@@ -23,8 +23,9 @@ This matters because it relocates the architectural decision. The
 planner stays neutral — it just decomposes work. The executor LLM,
 seeing the rule-bound nature of the booking, requests structured help.
 The bridge enforces the swap by atomic-rename file IPC
-(`ipc/handoff_to_structured.json`), so a crash mid-transition leaves
-exactly one of {old-half, new-half} responsible for the session.
+(`ipc/input/handoff_to_structured.json`, via `session.ipc_input_dir`),
+so a crash mid-transition leaves exactly one of {old-half, new-half}
+responsible for the session.
 
 The broader lesson: planner decisions are advisory categorization;
 tool-call decisions during execution are load-bearing. When debugging
