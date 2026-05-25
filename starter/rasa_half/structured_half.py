@@ -93,17 +93,27 @@ class RasaStructuredHalf(StructuredHalf):
             )
 
         booking = rasa_msg["metadata"]["booking"]
-        # TODO: Construct the request body using `rasa_msg`. It needs to be a JSON string encoded as utf-8.
-        # Ensure you include 'sender', 'message', and 'metadata' containing 'booking'.
+        request_body = json.dumps(
+            {
+                "sender": rasa_msg["sender"],
+                "message": rasa_msg["message"],
+                "metadata": {"booking": booking},
+            }
+        ).encode("utf-8")
 
-        # TODO: Create a urllib_request.Request object pointing to `self.rasa_url`, with the encoded body.
-        # Make sure to set the Content-Type header to application/json and method to POST.
+        http_request = urllib_request.Request(
+            self.rasa_url,
+            data=request_body,
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
 
-        # We execute the blocking urllib call in a thread pool for async compatibility
+        loop = asyncio.get_running_loop()
         try:
-            # TODO: Execute the request using `urllib_request.urlopen` in a lambda passed to run_in_executor.
-            # Use `self.request_timeout_s` as the timeout.
-            raise NotImplementedError("TODO: Implement HTTP POST to Rasa")
+            raw_response = await loop.run_in_executor(
+                None,
+                lambda: urllib_request.urlopen(http_request, timeout=self.request_timeout_s).read(),
+            )
         except HTTPError as e:
             return HalfResult(
                 success=False,
@@ -147,17 +157,56 @@ class RasaStructuredHalf(StructuredHalf):
                 next_action="escalate",
             )
 
-        # TODO: Parse the Rasa response array (`messages`).
-        # Loop through `messages`. Look for a 'custom' dict containing 'action' == 'committed' or 'rejected'.
-        # Set `confirmed`, `rejected`, `rejection_reason` and `booking_reference` accordingly.
-        # Note: If action is 'committed', extract 'booking_reference' from 'custom' or text.
-        # If action is 'rejected', extract 'rejection_reason' from 'text'.
-        
-        # TODO: Return the appropriate HalfResult.
-        # - If confirmed and not rejected: success=True, next_action="complete", include booking reference in output.
-        # - If rejected: success=False, next_action="escalate", include reason in output.
-        # - If neither: success=False, next_action="escalate", note unexpected output.
-        raise NotImplementedError("TODO: Parse Rasa response and return HalfResult")
+        confirmed = False
+        rejected = False
+        rejection_reason: str | None = None
+        booking_reference: str | None = None
+
+        for msg in messages if isinstance(messages, list) else []:
+            if not isinstance(msg, dict):
+                continue
+            custom = msg.get("custom") if isinstance(msg.get("custom"), dict) else {}
+            action = custom.get("action")
+            text = msg.get("text", "") or ""
+            if action == "committed":
+                confirmed = True
+                booking_reference = custom.get("booking_reference")
+                if not booking_reference and "Reference:" in text:
+                    booking_reference = text.split("Reference:", 1)[1].strip().rstrip(".")
+            elif action == "rejected":
+                rejected = True
+                rejection_reason = custom.get("reason")
+                if not rejection_reason and "Reason:" in text:
+                    rejection_reason = text.split("Reason:", 1)[1].strip().rstrip(".")
+
+        if confirmed and not rejected:
+            return HalfResult(
+                success=True,
+                output={
+                    "booking": booking,
+                    "booking_reference": booking_reference,
+                    "messages": messages,
+                },
+                summary=f"booking confirmed: {booking_reference}",
+                next_action="complete",
+            )
+        if rejected:
+            return HalfResult(
+                success=False,
+                output={
+                    "booking": booking,
+                    "rejection_reason": rejection_reason,
+                    "messages": messages,
+                },
+                summary=f"booking rejected: {rejection_reason}",
+                next_action="escalate",
+            )
+        return HalfResult(
+            success=False,
+            output={"booking": booking, "messages": messages, "error": "no decision"},
+            summary="rasa returned no committed/rejected action",
+            next_action="escalate",
+        )
 
 
 # ─────────────────────────────────────────────────────────────────────

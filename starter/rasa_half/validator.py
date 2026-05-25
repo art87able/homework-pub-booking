@@ -61,13 +61,20 @@ def normalise_booking_payload(raw: dict) -> dict:
         raise ValidationFailed("missing venue_id")
     venue_id = canonicalise_venue_id(venue_id_raw)
 
-    # TODO: Extract and normalise 'date' using _normalise_date. If missing, raise ValidationFailed("missing date").
-    
-    # TODO: Extract and parse 'time' using parse_time_24h. If missing, raise ValidationFailed("missing time").
+    date_raw = raw.get("date")
+    if not date_raw:
+        raise ValidationFailed("missing date")
+    date = _normalise_date(date_raw)
 
-    # TODO: Extract and parse 'party_size' using parse_party_size.
+    time_raw = raw.get("time")
+    if not time_raw:
+        raise ValidationFailed("missing time")
+    time = parse_time_24h(time_raw)
 
-    # TODO: Extract and parse 'deposit' (as deposit_gbp) using parse_currency_gbp. Remember to handle if it's not present (default to 0).
+    party_size = parse_party_size(raw.get("party_size"))
+
+    deposit_raw = raw.get("deposit", raw.get("deposit_gbp", 0))
+    deposit_gbp = parse_currency_gbp(deposit_raw) if deposit_raw not in (None, "") else 0
 
     duration = raw.get("duration_hours", 3)
     if isinstance(duration, str) and duration.isdigit():
@@ -79,26 +86,23 @@ def normalise_booking_payload(raw: dict) -> dict:
     if catering not in ("drinks_only", "bar_snacks", "sit_down_meal", "three_course_meal"):
         catering = "bar_snacks"
 
-    # TODO: Generate a 'stable_suffix' string using hashlib.sha1 on f"{venue_id}-{date}-{time}".encode().
-    # Take the first 8 characters of the hex digest.
-    
-    # TODO: Return a dictionary structured for Rasa:
-    # {
-    #     "sender": f"homework-{stable_suffix}",
-    #     "message": "/confirm_booking",
-    #     "metadata": {
-    #         "booking": {
-    #             "venue_id": venue_id,
-    #             "date": <your date var>,
-    #             "time": <your time var>,
-    #             "party_size": <your party var>,
-    #             "deposit_gbp": <your deposit var>,
-    #             "duration_hours": duration,
-    #             "catering_tier": catering,
-    #         }
-    #     },
-    # }
-    raise NotImplementedError("TODO: Implement the rest of normalise_booking_payload")
+    stable_suffix = hashlib.sha1(f"{venue_id}-{date}-{time}".encode()).hexdigest()[:8]
+
+    return {
+        "sender": f"homework-{stable_suffix}",
+        "message": "/confirm_booking",
+        "metadata": {
+            "booking": {
+                "venue_id": venue_id,
+                "date": date,
+                "time": time,
+                "party_size": party_size,
+                "deposit_gbp": deposit_gbp,
+                "duration_hours": duration,
+                "catering_tier": catering,
+            }
+        },
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -200,10 +204,9 @@ def parse_time_24h(raw: str) -> str:
 
 def canonicalise_venue_id(raw: str) -> str:
     """'Haymarket Tap' → 'haymarket_tap'. Leaves 'haymarket_tap' unchanged."""
-    # TODO: Convert the raw string to lowercase and strip whitespace.
-    # TODO: Replace spaces and hyphens with underscores.
-    # TODO: Remove any character that is not a lowercase letter, number, or underscore.
-    raise NotImplementedError("TODO: Implement canonicalise_venue_id")
+    lowered = str(raw).strip().lower()
+    with_underscores = re.sub(r"[\s\-]+", "_", lowered)
+    return re.sub(r"[^a-z0-9_]", "", with_underscores)
 
 
 def parse_party_size(raw: str | int) -> int:
