@@ -103,6 +103,29 @@ def test_tools_module_registers_four_tools() -> None:
         assert "handoff_to_structured" in names
 
 
+def test_tools_module_can_exclude_builtins() -> None:
+    """build_tool_registry(include_builtins=False) must omit framework builtins."""
+    import tempfile
+
+    from sovereign_agent.session.directory import create_session
+
+    from starter.edinburgh_research.tools import build_tool_registry
+
+    with tempfile.TemporaryDirectory() as td:
+        session_root = Path(td) / "sessions"
+        session_root.mkdir()
+        session = create_session(scenario="test", sessions_dir=session_root)
+
+        reg = build_tool_registry(session, include_builtins=False)
+        names = {t.name for t in reg.list()}
+
+        for required in ["venue_search", "get_weather", "calculate_cost", "generate_flyer"]:
+            assert required in names, f"{required} not registered"
+
+        assert "complete_task" not in names, "Builtins should be excluded"
+        assert "handoff_to_structured" not in names, "Builtins should be excluded"
+
+
 def test_generate_flyer_is_not_parallel_safe() -> None:
     """Writes must never be parallelised — grader checks this explicitly."""
     import tempfile

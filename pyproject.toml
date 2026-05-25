@@ -13,17 +13,18 @@ dependencies = [
   "sovereign-agent == 0.2.0",
   "python-dotenv >= 1.0.0",
   "pyyaml >= 6.0",
+  "more-itertools >= 11.0.2",
 ]
 
 [project.optional-dependencies]
 voice = [
   # Speechmatics real-time Python client (STT).
   "speechmatics-python >= 1.11.0",
-  # Rime.ai has no official Python SDK; we call the REST API directly.
+  # ElevenLabs has no official Python SDK we need; we call the REST API directly.
   "httpx >= 0.27.0",
   # Mic capture + audio playback (sounddevice uses PortAudio).
   "sounddevice >= 0.4.6",
-  # MP3 decode (Rime returns MP3; stdlib only handles WAV).
+  # MP3 decode (ElevenLabs returns MP3; stdlib only handles WAV).
   "pydub >= 0.25.1",
   "numpy >= 1.24",
 ]
