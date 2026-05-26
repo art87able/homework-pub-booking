@@ -168,14 +168,22 @@ class RasaStructuredHalf(StructuredHalf):
             custom = msg.get("custom") if isinstance(msg.get("custom"), dict) else {}
             action = custom.get("action")
             text = msg.get("text", "") or ""
+
+            # Explicit signal via custom payload (mock server emits this).
             if action == "committed":
                 confirmed = True
-                booking_reference = custom.get("booking_reference")
-                if not booking_reference and "Reference:" in text:
-                    booking_reference = text.split("Reference:", 1)[1].strip().rstrip(".")
+                booking_reference = booking_reference or custom.get("booking_reference")
             elif action == "rejected":
                 rejected = True
-                rejection_reason = custom.get("reason")
+                rejection_reason = rejection_reason or custom.get("reason")
+
+            # Fallback signal via text content (real Rasa utter_ responses).
+            if "Booking confirmed" in text:
+                confirmed = True
+                if not booking_reference and "Reference:" in text:
+                    booking_reference = text.split("Reference:", 1)[1].strip().rstrip(".")
+            elif "Booking rejected" in text or "can't accept this booking" in text:
+                rejected = True
                 if not rejection_reason and "Reason:" in text:
                     rejection_reason = text.split("Reason:", 1)[1].strip().rstrip(".")
 
@@ -244,8 +252,10 @@ class RasaHostLifecycle:
         log_dir: Path | None = None,
     ) -> None:
         # Default to the homework's rasa_project/ at the repo root
+        # __file__ -> starter/rasa_half/structured_half.py, so two .parent
+        # hops land us at the repo root.
         self.rasa_project_dir = rasa_project_dir or (
-            _SOLUTION_EX6.parent.parent.parent / "rasa_project"
+            _SOLUTION_EX6.parent.parent / "rasa_project"
         )
         self.rasa_port = rasa_port
         self.action_port = action_port
