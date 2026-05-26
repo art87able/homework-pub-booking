@@ -1,0 +1,38 @@
+2026-05-26 01:01:54 INFO     rasa.tracing.backend_tracing_config  - {"filename": "/private/tmp/art87able-work/rasa_project/endpoints.yml", "event_info": "No backend tracing configuration found in endpoints.yml. Supported backend tracing types are 'jaeger' and 'otlp'. Backend tracing will not be configured.", "event": "endpoint.read.no_backend_tracing_config", "level": "info"}
+2026-05-26 01:01:55 INFO     rasa.cli.train  - {"event_info": "Started validating domain and training data...", "event": "cli.train.run_training", "level": "info"}
+2026-05-26 01:01:55 INFO     rasa.shared.core.domain  - {"event": "domain.from_yaml.validating", "level": "info"}
+2026-05-26 01:01:55 INFO     rasa.shared.core.domain  - {"event": "domain.from_yaml.validating", "level": "info"}
+2026-05-26 01:01:55 INFO     rasa.validator  - {"event_info": "Validating intents...", "event": "validator.verify_intents_in_stories.start", "level": "info"}
+2026-05-26 01:01:55 INFO     rasa.validator  - {"event_info": "Validating uniqueness of intents and stories...", "event": "validator.verify_example_repetition_in_intents.start", "level": "info"}
+2026-05-26 01:01:55 INFO     rasa.validator  - {"event_info": "Story structure validation...", "event": "validator.verify_story_structure.start", "level": "info"}
+2026-05-26 01:01:55 INFO     rasa.core.training.story_conflict  - Considering all preceding turns for conflict analysis.
+2026-05-26 01:01:55 INFO     rasa.validator  - {"event_info": "No story structure conflicts found.", "event": "validator.verify_story_structure.no_conflicts", "level": "info"}
+2026-05-26 01:01:55 INFO     rasa.validator  - {"event": "validation.flows.started", "level": "info"}
+2026-05-26 01:01:55 INFO     rasa.validator  - {"event": "validation.flows.ended", "level": "info"}
+2026-05-26 01:01:56 INFO     rasa.cli.validation.bot_config  - {"sub_agents_path": "sub_agents", "event_info": "Default sub-agents directory does not exist, no sub-agents will be available.", "event": "cli.validate_files.sub_agents_validation", "level": "info"}
+2026-05-26 01:01:56 WARNING  rasa.validator  - {"event_info": "Default pattern flows include responses with rephrasing enabled, but the NLG endpoint is not configured in endpoints.yml. Rephrasing for default patterns will be skipped.", "event": "validator.verify_rephrase_endpoints_consistency.defaults_only_rephrase_without_nlg", "level": "warning"}
+2026-05-26 01:01:57 INFO     rasa.shared.core.domain  - {"event_info": "The entire domain content has been written to file.", "filename": "PosixPath('/var/folders/32/j4nxkwsd01v76kw_nhdw7nj80000gn/T/tmptsedce_2/domain_provider/domain.yml')", "event": "domain.persist.domain_written_to_file", "level": "info"}
+2026-05-26 01:01:57 INFO     rasa.engine.training.hooks  - Starting to train component 'FlowPolicy'.
+2026-05-26 01:01:57 INFO     rasa.engine.training.hooks  - Finished training component 'FlowPolicy'.
+2026-05-26 01:01:57 INFO     rasa.engine.training.hooks  - Starting to train component 'CompactLLMCommandGenerator'.
+2026-05-26 01:01:57 INFO     rasa.dialogue_understanding.generator.llm_based_command_generator  - {"event": "llm_based_command_generator.flow_retrieval.enabled", "level": "info"}
+2026-05-26 01:01:57 WARNING  rasa.shared.utils.llm  - {"event_info": "The LLM_API_HEALTH_CHECK environment variable is set to false, which will disable LLM health check. It is recommended to set this variable to true in production environments.", "event": "llm_based_command_generator.train.perform_llm_health_check.disabled", "level": "warning"}
+2026-05-26 01:01:57 WARNING  rasa.shared.utils.llm  - {"event_info": "The LLM_API_HEALTH_CHECK environment variable is set to false, which will disable embeddings API health check. It is recommended to set this variable to true in production environments.", "event": "flow_retrieval.train.perform_embeddings_health_check.disabled", "level": "warning"}
+2026-05-26 01:01:58 INFO     faiss.loader  - Loading faiss.
+2026-05-26 01:01:58 INFO     faiss.loader  - Successfully loaded faiss.
+2026-05-26 01:01:58 INFO     rasa.engine.training.hooks  - Finished training component 'CompactLLMCommandGenerator'.
+2026-05-26 01:01:58 INFO     rasa.model_training  - {"event_info": "Your Rasa model is trained and saved at 'models/20260526-010157-eager-liner.tar.gz'.", "event": "model_training.train.finished_training", "level": "info"}
+(0lqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqk(B
+(0x(B Rasa Pro reports anonymous usage telemetry to help improve the product       (0x(B
+(0x(B for all its users.                                                           (0x(B
+(0x(B                                                                              (0x(B
+(0x(B If you'd like to opt-out, you can use `rasa telemetry disable`.              (0x(B
+(0x(B To learn more, check out https://rasa.com/docs/rasa-pro/telemetry/telemetry. (0x(B
+(0mqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqj(B
+[92m
+------------------------------------------------------
+Want to help shape the future of Rasa Pro?
+Share your feedback in a short conversation with our team.
+Sign up at: https://feedback.rasa.com
+------------------------------------------------------
+[0m

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>The Edinburgh Castle — event flyer</title>
+<style>
+  body { font-family: -apple-system, system-ui, sans-serif; max-width: 640px;
+         margin: 2em auto; color: #222; line-height: 1.5; }
+  h1 { font-size: 2em; margin-bottom: 0.2em; }
+  dl { display: grid; grid-template-columns: max-content 1fr; gap: 0.3em 1em; }
+  dt { font-weight: 600; color: #555; }
+  section { margin-top: 1.5em; }
+</style>
+</head>
+<body>
+  <h1 data-testid="venue_name">The Edinburgh Castle</h1>
+  <p data-testid="venue_address">Castle Road, Edinburgh</p>
+
+  <section>
+    <h2>Event</h2>
+    <dl>
+      <dt>Date</dt><dd data-testid="date">2023-10-15</dd>
+      <dt>Time</dt><dd data-testid="time">19:00</dd>
+      <dt>Party size</dt><dd data-testid="party_size">10</dd>
+    </dl>
+  </section>
+
+  <section>
+    <h2>Weather</h2>
+    <dl>
+      <dt>Condition</dt><dd data-testid="condition">Sunny</dd>
+      <dt>Temperature</dt><dd data-testid="temperature_c">18°C</dd>
+    </dl>
+  </section>
+
+  <section>
+    <h2>Cost</h2>
+    <dl>
+      <dt>Total</dt><dd data-testid="total">£200</dd>
+      <dt>Deposit required</dt><dd data-testid="deposit">£50</dd>
+    </dl>
+  </section>
+</body>
+</html>

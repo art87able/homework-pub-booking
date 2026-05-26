@@ -1,0 +1,20 @@
+{
+  "ticket_id": "tk_cc788930",
+  "operation": "executor.run_subgoal/sg_2",
+  "started_at": "2026-05-25T23:58:26.310020+00:00",
+  "completed_at": "2026-05-25T23:58:41.221559+00:00",
+  "duration_ms": 14911,
+  "outputs": [
+    {
+      "path": "/private/tmp/art87able-work/sessions/examples/ex5-edinburgh-research/sess_2c7d54e6ad89/logs/tickets/tk_cc788930/raw_output.json",
+      "sha256": "3a465ff6092abb0fd772637cc424cdc4ae1701fd2ad692923bf466314729c65d",
+      "size_bytes": 1438,
+      "content_type": "application/json"
+    }
+  ],
+  "metrics": {
+    "tool_calls": 2,
+    "turns_used": 3,
+    "handoff_requested": false
+  }
+}

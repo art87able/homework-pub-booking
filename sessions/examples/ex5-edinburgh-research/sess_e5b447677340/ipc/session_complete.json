@@ -1,0 +1,11 @@
+{
+  "session_id": "sess_e5b447677340",
+  "result": {
+    "weather_data": {
+      "city": "Edinburgh",
+      "date": "2026-04-25",
+      "condition": "cloudy",
+      "temperature_c": 12
+    }
+  }
+}

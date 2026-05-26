@@ -1,0 +1,21 @@
+{
+  "ticket_id": "tk_a7b7b50a",
+  "operation": "planner.plan",
+  "started_at": "2026-05-25T23:57:35.040514+00:00",
+  "completed_at": "2026-05-25T23:58:05.015196+00:00",
+  "duration_ms": 29974,
+  "outputs": [
+    {
+      "path": "/private/tmp/art87able-work/sessions/examples/ex5-edinburgh-research/sess_2c7d54e6ad89/logs/tickets/tk_a7b7b50a/raw_output.json",
+      "sha256": "614f7a8c91fe4e1a3f54100438ab603d1ae9c0cc3eca0f730ac4f5ed5e7b5a36",
+      "size_bytes": 1610,
+      "content_type": "application/json"
+    }
+  ],
+  "metrics": {
+    "num_subgoals": 5,
+    "llm_tokens_in": 513,
+    "llm_tokens_out": 5087,
+    "llm_model": "Qwen/Qwen3-Next-80B-A3B-Thinking"
+  }
+}
