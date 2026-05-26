@@ -13,6 +13,9 @@ dependencies = [
   "sovereign-agent == 0.2.0",
   "python-dotenv >= 1.0.0",
   "pyyaml >= 6.0",
+  # Some uv + Python 3.12 combos need an explicit setuptools pin so
+  # `make setup` succeeds on a clean CI venv. Defensive.
+  "setuptools >= 80.10.2",
 ]
 
 [project.optional-dependencies]
