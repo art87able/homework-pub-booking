@@ -96,6 +96,26 @@ def extract_testid_facts(text: str) -> dict[str, str]:
     return {m.group(1): m.group(2).strip() for m in pattern.finditer(text)}
 
 
+# Labels we consider "fact slots" in a plain-markdown flyer. The value is
+# the trailing text on the line, stripped of punctuation/HTML.
+_LABEL_PATTERN = re.compile(
+    r"(?im)^\s*(?:venue|total|deposit|cost|weather|temperature|condition|date|time|party[ _]size)\s*:\s*(.+?)\s*\.?\s*$",
+)
+
+
+def extract_field_values(text: str) -> list[str]:
+    """Extract the right-hand side of `Label: value` lines in a flyer.
+
+    Catches fabrications that the money / temperature / condition extractors
+    miss — e.g. a hallucinated venue name written into the `Total:` slot, or
+    an out-of-range weather descriptor like `scorching 35C`. Values are
+    returned verbatim (no normalisation) so the grader probe's substring
+    check sees them.
+    """
+    stripped = re.sub(r"<[^>]+>", " ", text)
+    return [m.group(1).strip().rstrip(".") for m in _LABEL_PATTERN.finditer(stripped)]
+
+
 def fact_appears_in_log(fact: Any, log: list[ToolCallRecord] | None = None) -> bool:
     records = log if log is not None else _TOOL_CALL_LOG
     target = str(fact).lower().strip("£°c ")
@@ -123,6 +143,7 @@ def verify_dataflow(flyer_content: str) -> IntegrityResult:
     facts_to_check.extend(extract_money_facts(flyer_content))
     facts_to_check.extend(extract_temperature_facts(flyer_content))
     facts_to_check.extend(extract_condition_facts(flyer_content))
+    facts_to_check.extend(extract_field_values(flyer_content))
 
     # De-dupe while preserving order
     seen: set[str] = set()
@@ -170,6 +191,7 @@ __all__ = [
     "_TOOL_CALL_LOG",
     "clear_log",
     "extract_condition_facts",
+    "extract_field_values",
     "extract_money_facts",
     "extract_temperature_facts",
     "extract_testid_facts",

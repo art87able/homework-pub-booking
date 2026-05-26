@@ -22,12 +22,14 @@ verifies the trace has at least one round_start, at least one
 state_changed, and at least one tool call — catching the case where
 the bridge reports success without doing real work.
 
-The stale-handoff cleanup moves old ipc/input/handoff_to_structured.json
-files into logs/handoffs/ instead of deleting them, preserving the
-audit trail (see bridge.py:147-149, archiving to
-session.handoffs_audit_dir).
+The stale-handoff cleanup moves old `ipc/input/handoff_to_structured.json`
+files into `handoffs_audit_dir/round_<n>_forward.json` instead of
+deleting them, satisfying the "at most one handoff file in `ipc/` at
+any time" rule while preserving the audit trail.
 
 ## Citations
 
-- starter/handoff_bridge/bridge.py — HandoffBridge.run + helpers
-- starter/handoff_bridge/integrity.py — verify_dataflow
+- `starter/handoff_bridge/bridge.py::HandoffBridge.run` — round loop, forward + reverse handoff plumbing, archival of each round's forward handoff
+- `starter/handoff_bridge/bridge.py::build_forward_handoff` + `build_reverse_task` — payload constructors
+- `starter/handoff_bridge/integrity.py::verify_dataflow` — checks the trace contains `bridge.round_start` + `session.state_changed` + at least one `executor.tool_called`
+- `sessions/examples/ex7-handoff-bridge/sess_f972b3090243/logs/trace.jsonl` — successful round-trip: round 1 proposes `haymarket_tap` for party 12, structured half rejects with `party_too_large`, round 2 proposes `royal_oak` for party 6, structured half confirms. `Bridge outcome: completed, rounds: 2`

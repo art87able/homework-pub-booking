@@ -27,7 +27,8 @@ not just tool returns.
 
 ## Citations
 
-- starter/edinburgh_research/tools.py:382 — flyer is written to `workspace/flyer.html`
-- sessions/sess_*/logs/trace.jsonl — tool call sequence (venue_search, get_weather, calculate_cost in parallel, then generate_flyer, then complete_task)
-- sessions/sess_*/workspace/flyer.html — the produced HTML flyer
-- starter/edinburgh_research/integrity.py:99-112 — `fact_appears_in_log` scans both output and arguments
+- `starter/edinburgh_research/tools.py::generate_flyer` — flyer written to `workspace/flyer.html`
+- `sessions/examples/ex5-edinburgh-research/sess_2c7d54e6ad89/logs/trace.jsonl` — real-mode run, four tool calls then a successful dataflow integrity check (`verified 4 fact(s)`)
+- `sessions/examples/ex5-edinburgh-research/sess_2c7d54e6ad89/workspace/flyer.html` — the produced HTML flyer
+- `sessions/examples/ex5-edinburgh-research/sess_{0b674691893d,8fec692c42eb,e5b447677340}/` — three Qwen-spiral failure traces where the executor stopped before `generate_flyer`, kept as the contrast case
+- `starter/edinburgh_research/integrity.py::fact_appears_in_log` — scans both `output` and `arguments` of every `ToolCallRecord`

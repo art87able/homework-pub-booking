@@ -1,0 +1,20 @@
+{
+  "ticket_id": "tk_df4a46c9",
+  "operation": "executor.run_subgoal/sg_1",
+  "started_at": "2026-05-26T00:17:51.580743+00:00",
+  "completed_at": "2026-05-26T00:17:51.581642+00:00",
+  "duration_ms": 0,
+  "outputs": [
+    {
+      "path": "/private/tmp/art87able-work/sessions/examples/ex7-handoff-bridge/sess_25769c230dc9/logs/tickets/tk_df4a46c9/raw_output.json",
+      "sha256": "975748dd50754f361a95574fe19a82285757a3b02963d36cf42687fb1ecb1c7e",
+      "size_bytes": 1830,
+      "content_type": "application/json"
+    }
+  ],
+  "metrics": {
+    "tool_calls": 2,
+    "turns_used": 2,
+    "handoff_requested": true
+  }
+}
