@@ -64,18 +64,17 @@ def normalise_booking_payload(raw: dict) -> dict:
     date_raw = raw.get("date")
     if not date_raw:
         raise ValidationFailed("missing date")
-    date_iso = _normalise_date(date_raw)
+    date = _normalise_date(date_raw)
 
     time_raw = raw.get("time")
     if not time_raw:
         raise ValidationFailed("missing time")
-    time_24h = parse_time_24h(time_raw)
+    time = parse_time_24h(time_raw)
 
-    party = parse_party_size(raw.get("party_size"))
+    party_size = parse_party_size(raw.get("party_size"))
 
-    deposit = 0
-    if raw.get("deposit") is not None:
-        deposit = parse_currency_gbp(raw["deposit"])
+    deposit_raw = raw.get("deposit", raw.get("deposit_gbp", 0))
+    deposit_gbp = parse_currency_gbp(deposit_raw) if deposit_raw not in (None, "") else 0
 
     duration = raw.get("duration_hours", 3)
     if isinstance(duration, str) and duration.isdigit():
@@ -87,7 +86,7 @@ def normalise_booking_payload(raw: dict) -> dict:
     if catering not in ("drinks_only", "bar_snacks", "sit_down_meal", "three_course_meal"):
         catering = "bar_snacks"
 
-    stable_suffix = hashlib.sha1(f"{venue_id}-{date_iso}-{time_24h}".encode()).hexdigest()[:8]
+    stable_suffix = hashlib.sha1(f"{venue_id}-{date}-{time}".encode()).hexdigest()[:8]
 
     return {
         "sender": f"homework-{stable_suffix}",
@@ -95,10 +94,10 @@ def normalise_booking_payload(raw: dict) -> dict:
         "metadata": {
             "booking": {
                 "venue_id": venue_id,
-                "date": date_iso,
-                "time": time_24h,
-                "party_size": party,
-                "deposit_gbp": deposit,
+                "date": date,
+                "time": time,
+                "party_size": party_size,
+                "deposit_gbp": deposit_gbp,
                 "duration_hours": duration,
                 "catering_tier": catering,
             }
@@ -205,10 +204,9 @@ def parse_time_24h(raw: str) -> str:
 
 def canonicalise_venue_id(raw: str) -> str:
     """'Haymarket Tap' → 'haymarket_tap'. Leaves 'haymarket_tap' unchanged."""
-    s = str(raw).strip().lower()
-    s = re.sub(r"[\s\-]+", "_", s)
-    s = re.sub(r"[^a-z0-9_]", "", s)
-    return s
+    lowered = str(raw).strip().lower()
+    with_underscores = re.sub(r"[\s\-]+", "_", lowered)
+    return re.sub(r"[^a-z0-9_]", "", with_underscores)
 
 
 def parse_party_size(raw: str | int) -> int:

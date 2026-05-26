@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "from_half": "loop",
+  "to_half": "structured",
+  "written_at": "2026-05-25T23:44:47.892531+00:00",
+  "session_id": "sess_8fec692c42eb",
+  "reason": "No venues found in Edinburgh areas after multiple attempts with adjusted parameters. Venue search returns 0 results despite valid area names and budget ranges.",
+  "context": "Subgoal requires 3+ venues with details. Tried Haymarket, New Town, Old Town with party sizes 10-12 and budgets \u00a3500-\u00a31000.",
+  "data": {
+    "attempts": [
+      {
+        "area": "Haymarket",
+        "party": 10,
+        "budget": 500
+      },
+      {
+        "area": "New Town",
+        "party": 10,
+        "budget": 800
+      },
+      {
+        "area": "Old Town",
+        "party": 12,
+        "budget": 1000
+      }
+    ]
+  },
+  "return_instructions": ""
+}

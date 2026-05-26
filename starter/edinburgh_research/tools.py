@@ -416,16 +416,19 @@ def generate_flyer(session: Session, event_details: dict) -> ToolResult:
 # Registry builder — DO NOT MODIFY the name, signature, or registration calls.
 # The grader imports and calls this to pick up your tools.
 # ---------------------------------------------------------------------------
-def build_tool_registry(session: Session) -> ToolRegistry:
-    """Build a session-scoped tool registry with all four Ex5 tools plus
-    the sovereign-agent builtins (read_file, write_file, list_files,
+def build_tool_registry(session: Session, *, include_builtins: bool = True) -> ToolRegistry:
+    """Build a session-scoped tool registry with all four Ex5 tools, optionally
+    including the sovereign-agent builtins (read_file, write_file, list_files,
     handoff_to_structured, complete_task).
+
+    Pass include_builtins=False to get only the homework's tools — handy in
+    tests where we want to assert that nothing else leaked into the registry.
 
     DO NOT change the tool names — the tests and grader call them by name.
     """
     from sovereign_agent.tools.builtin import make_builtin_registry
 
-    reg = make_builtin_registry(session)
+    reg = make_builtin_registry(session) if include_builtins else ToolRegistry()
 
     # venue_search
     reg.register(

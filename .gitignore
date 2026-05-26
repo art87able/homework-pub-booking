@@ -5,8 +5,10 @@
 .env.*.local
 
 # ── Session artifacts ────────────────────────────────────────────────
-# Sessions contain API output and should not be committed.
-sessions/
+# Per office-hour decision: cited session traces ARE committed so the
+# grader's LLM-as-judge can verify groundedness. Local demo runs and
+# legacy session.json files remain ignored.
+# sessions/  # intentionally NOT ignored — see chore(sessions) commits
 demo_sessions_*/
 *.session.json
 

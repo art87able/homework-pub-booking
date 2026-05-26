@@ -1,0 +1,9 @@
+{
+  "ticket_id": "tk_dcc64c72",
+  "operation": "executor.run_subgoal/sg_1",
+  "state": "success",
+  "started_at": "2026-05-26T00:09:00.117175+00:00",
+  "completed_at": "2026-05-26T00:09:00.118503+00:00",
+  "error_code": null,
+  "error_message": null
+}

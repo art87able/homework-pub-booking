@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "from_half": "loop",
+  "to_half": "structured",
+  "written_at": "2026-05-25T23:47:39.529647+00:00",
+  "session_id": "sess_0b674691893d",
+  "reason": "No venues found in Edinburgh areas after 3 attempts. Need human guidance to adjust search parameters or confirm venue details.",
+  "context": "Tried Haymarket, New Town, Old Town with party_size=10. All returned 0 results. Spiral guard triggered on venue_search.",
+  "data": {
+    "subgoal": "sg_1",
+    "status": "blocked"
+  },
+  "return_instructions": ""
+}

@@ -1,18 +1,18 @@
-"""Ex8 — voice loop (reference solution).
+"""Ex8 — voice loop.
 
 Two modes:
   * text mode: stdin → manager → stdout. Free, no mic needed.
   * voice mode: mic → Speechmatics realtime STT → manager →
-    Rime.ai Arcana TTS → speakers.
+    ElevenLabs REST TTS → speakers.
 
 Both modes write identical trace events so downstream grading
 doesn't care which ran.
 
 Voice mode degrades gracefully:
-  - No SPEECHMATICS_KEY        → text mode with warning
-  - No RIME_API_KEY            → voice STT, but manager replies printed not spoken
+  - No SPEECHMATICS_KEY         → text mode with warning
+  - No ELEVENLABS_API_KEY       → voice STT, but manager replies printed not spoken
   - speechmatics-python missing → text mode with install hint
-  - No mic / no playback       → attempted run; errors surface clearly
+  - No mic / no playback        → attempted run; errors surface clearly
 """
 
 from __future__ import annotations
@@ -81,11 +81,11 @@ async def run_text_mode(session: Session, persona: ManagerPersona, max_turns: in
 # Voice mode — real Speechmatics STT + Rime Arcana TTS
 # ---------------------------------------------------------------------------
 async def run_voice_mode(session: Session, persona: ManagerPersona, max_turns: int = 6) -> None:
-    """Voice mode. Real mic capture → Speechmatics STT → manager → Rime TTS."""
+    """Voice mode. Real mic capture → Speechmatics STT → manager → ElevenLabs TTS."""
 
     # ── preflight: keys + deps ─────────────────────────────────────
     speechmatics_key = os.environ.get("SPEECHMATICS_KEY", "").strip()
-    rime_key = os.environ.get("RIME_API_KEY", "").strip()
+    elevenlabs_key = os.environ.get("ELEVENLABS_API_KEY", "").strip()
 
     if not speechmatics_key:
         print(
@@ -116,11 +116,11 @@ async def run_voice_mode(session: Session, persona: ManagerPersona, max_turns: i
         await run_text_mode(session, persona, max_turns=max_turns)
         return
 
-    # Rime is optional — we fall through to text-reply-only if missing
-    rime_enabled = bool(rime_key)
-    if not rime_enabled:
+    # ElevenLabs is optional — we fall through to text-reply-only if missing
+    tts_enabled = bool(elevenlabs_key)
+    if not tts_enabled:
         print(
-            "ℹ  RIME_API_KEY not set — manager replies will be printed, not spoken.",
+            "ℹ  ELEVENLABS_API_KEY not set — manager replies will be printed, not spoken.",
             file=sys.stderr,
         )
 
@@ -199,10 +199,10 @@ async def run_voice_mode(session: Session, persona: ManagerPersona, max_turns: i
             }
         )
 
-        # ── speak reply via Rime TTS (if enabled) ──────────────────
-        if rime_enabled:
+        # ── speak reply via ElevenLabs TTS (if enabled) ────────────
+        if tts_enabled:
             try:
-                await _speak_rime(manager_text, rime_key, sd)
+                await _speak_elevenlabs(manager_text, elevenlabs_key, sd, session, turn_idx)
             except Exception as e:  # noqa: BLE001
                 print(f"   ⚠ TTS playback failed: {e} (continuing)", file=sys.stderr)
 
@@ -336,31 +336,49 @@ async def _transcribe_speechmatics(
 
 
 # ---------------------------------------------------------------------------
-# Rime.ai Arcana TTS + playback
+# ElevenLabs TTS + playback
 # ---------------------------------------------------------------------------
-async def _speak_rime(text: str, api_key: str, sd) -> None:
-    """Call Rime.ai TTS, get MP3 back, play it."""
+ELEVENLABS_DEFAULT_VOICE_ID = "21m00Tcm4TlvDq8ikWAM"  # "Rachel" — neutral preset
+ELEVENLABS_DEFAULT_MODEL_ID = "eleven_multilingual_v2"
+
+
+async def _speak_elevenlabs(
+    text: str,
+    api_key: str,
+    sd,
+    session: Session,
+    turn: int,
+) -> None:
+    """Call ElevenLabs REST TTS, get MP3 back, play it, save it under workspace/."""
     import httpx
 
-    url = "https://users.rime.ai/v1/rime-tts"
+    voice_id = os.environ.get("ELEVENLABS_VOICE_ID", "").strip() or ELEVENLABS_DEFAULT_VOICE_ID
+    model_id = os.environ.get("ELEVENLABS_MODEL_ID", "").strip() or ELEVENLABS_DEFAULT_MODEL_ID
+
+    url = f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}"
     payload = {
-        "speaker": "luna",  # an Arcana voice; change if Rime renames
         "text": text,
-        "modelId": "arcana",
-        "audioFormat": "mp3",
+        "model_id": model_id,
+        "voice_settings": {"stability": 0.5, "similarity_boost": 0.75},
     }
     headers = {
-        "Authorization": f"Bearer {api_key}",
+        "xi-api-key": api_key,
         "Content-Type": "application/json",
-        "Accept": "audio/mp3",
+        "Accept": "audio/mpeg",
     }
 
-    async with httpx.AsyncClient(timeout=30.0) as http:
-        resp = await http.post(url, json=payload, headers=headers)
-        if resp.status_code != 200:
-            # Rime sends JSON error for 4xx
-            raise RuntimeError(f"Rime {resp.status_code}: {resp.text[:200]}")
-        mp3_bytes = resp.content
+    async with httpx.AsyncClient(timeout=30.0) as client:
+        response = await client.post(url, json=payload, headers=headers)
+        if response.status_code != 200:
+            raise RuntimeError(
+                f"ElevenLabs returned HTTP {response.status_code}: {response.text[:200]}"
+            )
+        mp3_bytes = response.content
+
+    # Persist the generated audio so the trace is auditable.
+    mp3_path = session.workspace_dir / f"turn_{turn}_reply.mp3"
+    mp3_path.parent.mkdir(parents=True, exist_ok=True)
+    mp3_path.write_bytes(mp3_bytes)
 
     # Decode MP3 → PCM via pydub (stdlib can't handle mp3)
     try:

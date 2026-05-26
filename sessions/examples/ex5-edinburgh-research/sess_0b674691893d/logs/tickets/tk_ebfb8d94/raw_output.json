@@ -1,0 +1,22 @@
+[
+  {
+    "id": "sg_1",
+    "description": "Research and select a suitable venue in Edinburgh, gathering all necessary details for the flyer.",
+    "success_criterion": "Venue name, address, capacity, price range, and key features are confirmed.",
+    "estimated_tool_calls": 1,
+    "depends_on": [],
+    "assigned_half": "loop",
+    "status": "pending"
+  },
+  {
+    "id": "sg_2",
+    "description": "Draft a promotional flyer using the selected venue's details.",
+    "success_criterion": "A complete flyer text is generated with event information and venue specifics.",
+    "estimated_tool_calls": 1,
+    "depends_on": [
+      "sg_1"
+    ],
+    "assigned_half": "loop",
+    "status": "pending"
+  }
+]

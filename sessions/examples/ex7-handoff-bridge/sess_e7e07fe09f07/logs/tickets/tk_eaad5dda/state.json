@@ -1,0 +1,9 @@
+{
+  "ticket_id": "tk_eaad5dda",
+  "operation": "planner.plan",
+  "state": "error",
+  "started_at": "2026-05-26T00:02:53.497566+00:00",
+  "completed_at": "2026-05-26T00:02:53.497773+00:00",
+  "error_code": "SA_EXT_UNEXPECTED_RESPONSE",
+  "error_message": "FakeLLMClient ran out of scripted responses"
+}

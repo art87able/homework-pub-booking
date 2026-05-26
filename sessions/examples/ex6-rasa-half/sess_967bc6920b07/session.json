@@ -1,0 +1,19 @@
+{
+  "session_id": "sess_967bc6920b07",
+  "version": 1,
+  "created_at": "2026-05-26T00:02:35.200001+00:00",
+  "updated_at": "2026-05-26T00:02:35.200001+00:00",
+  "scenario": "ex6-rasa",
+  "state": "planning",
+  "user_id": null,
+  "current_half": "loop",
+  "planner": {},
+  "executor": {},
+  "structured": {},
+  "memory": {},
+  "handoff_history": [],
+  "bare_mode": false,
+  "config_overrides": {},
+  "result": null,
+  "resumed_from": null
+}

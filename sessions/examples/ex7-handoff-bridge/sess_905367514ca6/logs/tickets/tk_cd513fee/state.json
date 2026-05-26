@@ -1,0 +1,9 @@
+{
+  "ticket_id": "tk_cd513fee",
+  "operation": "planner.plan",
+  "state": "success",
+  "started_at": "2026-05-26T00:09:00.115593+00:00",
+  "completed_at": "2026-05-26T00:09:00.116185+00:00",
+  "error_code": null,
+  "error_message": null
+}

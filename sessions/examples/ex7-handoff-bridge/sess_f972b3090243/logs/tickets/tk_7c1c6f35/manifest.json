@@ -1,0 +1,21 @@
+{
+  "ticket_id": "tk_7c1c6f35",
+  "operation": "planner.plan",
+  "started_at": "2026-05-26T00:04:30.804634+00:00",
+  "completed_at": "2026-05-26T00:04:30.804799+00:00",
+  "duration_ms": 0,
+  "outputs": [
+    {
+      "path": "/private/tmp/art87able-work/sessions/examples/ex7-handoff-bridge/sess_f972b3090243/logs/tickets/tk_7c1c6f35/raw_output.json",
+      "sha256": "70f5833b8ed628c42977c465c1823c325549c9b003e16728e57110af81342414",
+      "size_bytes": 239,
+      "content_type": "application/json"
+    }
+  ],
+  "metrics": {
+    "num_subgoals": 1,
+    "llm_tokens_in": 10,
+    "llm_tokens_out": 10,
+    "llm_model": "fake"
+  }
+}

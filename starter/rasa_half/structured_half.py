@@ -93,24 +93,26 @@ class RasaStructuredHalf(StructuredHalf):
             )
 
         booking = rasa_msg["metadata"]["booking"]
-        body = json.dumps(
+        request_body = json.dumps(
             {
                 "sender": rasa_msg["sender"],
                 "message": rasa_msg["message"],
                 "metadata": {"booking": booking},
             }
         ).encode("utf-8")
-        req = urllib_request.Request(
+
+        http_request = urllib_request.Request(
             self.rasa_url,
-            data=body,
+            data=request_body,
             headers={"Content-Type": "application/json"},
             method="POST",
         )
 
+        loop = asyncio.get_running_loop()
         try:
-            raw_response = await asyncio.get_event_loop().run_in_executor(
+            raw_response = await loop.run_in_executor(
                 None,
-                lambda: urllib_request.urlopen(req, timeout=self.request_timeout_s).read(),
+                lambda: urllib_request.urlopen(http_request, timeout=self.request_timeout_s).read(),
             )
         except HTTPError as e:
             return HalfResult(
@@ -157,58 +159,60 @@ class RasaStructuredHalf(StructuredHalf):
 
         confirmed = False
         rejected = False
-        rejection_reason = ""
-        booking_reference = None
-        for m in messages:
-            if not isinstance(m, dict):
-                continue
-            text = (m.get("text") or "").lower()
-            custom = m.get("custom") or {}
-            action = custom.get("action") if isinstance(custom, dict) else None
+        rejection_reason: str | None = None
+        booking_reference: str | None = None
 
-            if action == "committed" or "booking confirmed" in text:
+        for msg in messages if isinstance(messages, list) else []:
+            if not isinstance(msg, dict):
+                continue
+            custom = msg.get("custom") if isinstance(msg.get("custom"), dict) else {}
+            action = custom.get("action")
+            text = msg.get("text", "") or ""
+
+            # Explicit signal via custom payload (mock server emits this).
+            if action == "committed":
                 confirmed = True
-                if isinstance(custom, dict):
-                    booking_reference = custom.get("booking_reference")
-                if "reference:" in text and not booking_reference:
-                    booking_reference = text.split("reference:", 1)[1].strip().rstrip(".").upper()
-            if action == "rejected" or "can't accept" in text or "rejected" in text:
+                booking_reference = booking_reference or custom.get("booking_reference")
+            elif action == "rejected":
                 rejected = True
-                rejection_reason = text or "rejected by rasa"
+                rejection_reason = rejection_reason or custom.get("reason")
+
+            # Fallback signal via text content (real Rasa utter_ responses).
+            if "Booking confirmed" in text:
+                confirmed = True
+                if not booking_reference and "Reference:" in text:
+                    booking_reference = text.split("Reference:", 1)[1].strip().rstrip(".")
+            elif "Booking rejected" in text or "can't accept this booking" in text:
+                rejected = True
+                if not rejection_reason and "Reason:" in text:
+                    rejection_reason = text.split("Reason:", 1)[1].strip().rstrip(".")
 
         if confirmed and not rejected:
             return HalfResult(
                 success=True,
                 output={
-                    "committed": True,
                     "booking": booking,
                     "booking_reference": booking_reference,
-                    "rasa_response": messages,
+                    "messages": messages,
                 },
-                summary=f"booking confirmed by rasa (ref={booking_reference})",
+                summary=f"booking confirmed: {booking_reference}",
                 next_action="complete",
             )
-
         if rejected:
             return HalfResult(
                 success=False,
                 output={
-                    "rejected": True,
-                    "reason": rejection_reason,
-                    "rasa_response": messages,
                     "booking": booking,
+                    "rejection_reason": rejection_reason,
+                    "messages": messages,
                 },
-                summary=f"rasa rejected: {rejection_reason}",
+                summary=f"booking rejected: {rejection_reason}",
                 next_action="escalate",
             )
-
         return HalfResult(
             success=False,
-            output={
-                "rasa_response": messages,
-                "note": "neither confirmation nor rejection detected",
-            },
-            summary="rasa returned unexpected output",
+            output={"booking": booking, "messages": messages, "error": "no decision"},
+            summary="rasa returned no committed/rejected action",
             next_action="escalate",
         )
 
@@ -248,9 +252,9 @@ class RasaHostLifecycle:
         log_dir: Path | None = None,
     ) -> None:
         # Default to the homework's rasa_project/ at the repo root
-        self.rasa_project_dir = rasa_project_dir or (
-            _SOLUTION_EX6.parent.parent.parent / "rasa_project"
-        )
+        # __file__ -> starter/rasa_half/structured_half.py, so two .parent
+        # hops land us at the repo root.
+        self.rasa_project_dir = rasa_project_dir or (_SOLUTION_EX6.parent.parent / "rasa_project")
         self.rasa_port = rasa_port
         self.action_port = action_port
         self.startup_timeout_s = startup_timeout_s
