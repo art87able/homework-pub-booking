@@ -1,11 +1,11 @@
-# Ex8 — Voice pipeline
+# Ex8 - Voice pipeline
 
 ## Your answer
 
 The voice pipeline has two modes with a shared trace-event contract:
 text mode (`run_text_mode`) reads stdin and the manager persona
 replies via Llama-3.3-70B-Instruct on Nebius; voice mode
-(`run_voice_mode`) wires real STT and TTS — Speechmatics realtime
+(`run_voice_mode`) wires real STT and TTS - Speechmatics realtime
 WebSocket for speech-to-text, ElevenLabs REST
 (`POST /v1/text-to-speech/{voice_id}`) for text-to-speech. The
 generated MP3 is persisted to `<session>/workspace/turn_<n>_reply.mp3`
@@ -18,7 +18,7 @@ missing, it falls through to `run_text_mode`. `ELEVENLABS_API_KEY`
 is then checked separately: when absent, STT still runs but the
 manager's replies are printed instead of synthesised. So the
 "voice loop implemented" check passes without any voice credentials
-— same code, simpler transport — and partial voice mode (input only)
+ - same code, simpler transport - and partial voice mode (input only)
 still works without ElevenLabs.
 
 Both modes emit `voice.utterance_in` and `voice.utterance_out` trace
@@ -34,7 +34,7 @@ runs even when we exercise it against the real model.
 
 ## Citations
 
-- `starter/voice_pipeline/voice_loop.py::run_voice_mode` — STT/TTS dispatch + graceful degradation
-- `starter/voice_pipeline/voice_loop.py::_speak_elevenlabs` — REST call, MP3 persist, pydub decode, sounddevice playback
-- `starter/voice_pipeline/manager_persona.py::ManagerPersona` — Llama-3.3-70B client with the Alasdair MacLeod system prompt
-- `sessions/homework/ex8/sess_4ef360130f41/logs/trace.jsonl` — three-turn dialog: party of 6, £200 deposit, manager accepts and asks for the contact number
+- `starter/voice_pipeline/voice_loop.py::run_voice_mode` - STT/TTS dispatch + graceful degradation
+- `starter/voice_pipeline/voice_loop.py::_speak_elevenlabs` - REST call, MP3 persist, pydub decode, sounddevice playback
+- `starter/voice_pipeline/manager_persona.py::ManagerPersona` - Llama-3.3-70B client with the Alasdair MacLeod system prompt
+- `sessions/homework/ex8/sess_4ef360130f41/logs/trace.jsonl` - three-turn dialog: party of 6, £200 deposit, manager accepts and asks for the contact number
