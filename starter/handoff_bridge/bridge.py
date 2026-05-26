@@ -92,7 +92,9 @@ class HandoffBridge:
 
             if last_loop.next_action != "handoff_to_structured":
                 session.mark_failed(
-                    {"reason": f"loop half returned unexpected next_action={last_loop.next_action!r}"}
+                    {
+                        "reason": f"loop half returned unexpected next_action={last_loop.next_action!r}"
+                    }
                 )
                 return BridgeResult(
                     outcome="failed",
